@@ -1,40 +1,82 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Plane Flappy Game</title>
+  <meta charset="UTF-8">
+  <title>Important Question 😏</title>
+  <style>
+    body {
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      font-family: Arial, sans-serif;
+      color: white;
+    }
 
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+    .box {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 30px 40px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
 
-body {
-  background: #000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  overflow: hidden;
-  font-family: Arial, sans-serif;
-}
+    h1 {
+      margin-bottom: 25px;
+    }
 
-.game {
-  position: relative;
-  width: 400px;
-  height: 600px;
-  overflow: hidden;
-  background: skyblue;
-}
+    button {
+      padding: 12px 25px;
+      margin: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
 
-/* Background */
-.background {
-  position: absolute;
-  width: 800px;
-  height: 600px;
-  background: linear-gradient(#87ceeb, #b0e0e6);
+    .yes {
+      background: #4CAF50;
+      color: white;
+    }
+
+    .no {
+      background: #f44336;
+      color: white;
+    }
+
+    button:hover {
+      transform: scale(1.1);
+    }
+
+    #result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h1>Are you gay? 🤨</h1>
+    <button class="yes" onclick="answer()">Yes</button>
+    <button class="no" onclick="answer()">No</button>
+
+    <div id="result">I knew that 😎</div>
+  </div>
+
+  <script>
+    function answer() {
+      const result = document.getElementById("result");
+      result.style.display = "block";
+    }
+  </script>
+
+</body>
+</html>  background: linear-gradient(#87ceeb, #b0e0e6);
   animation: bgMove 6s linear infinite;
 }
 
