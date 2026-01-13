@@ -1,111 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Status</title>
+<meta charset="UTF-8">
+<title>Plane Flappy Game</title>
 
 <style>
-    body {
-        margin: 0;
-        height: 100vh;
-        background: radial-gradient(circle at top, #111827, #020617);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: system-ui, -apple-system, BlinkMacSystemFont;
-        color: #e5e7eb;
-    }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-    .panel {
-        width: 360px;
-        padding: 40px 30px;
-        background: rgba(255,255,255,0.06);
-        backdrop-filter: blur(22px);
-        -webkit-backdrop-filter: blur(22px);
-        border-radius: 28px;
-        border: 1px solid rgba(255,255,255,0.12);
-        box-shadow: 0 30px 80px rgba(0,0,0,0.7);
-    }
+body {
+  background: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
 
-    .label {
-        font-size: 13px;
-        letter-spacing: 1.4px;
-        opacity: 0.7;
-        margin-bottom: 20px;
-    }
+.game {
+  position: relative;
+  width: 400px;
+  height: 600px;
+  overflow: hidden;
+  background: skyblue;
+}
 
-    .tank {
-        height: 240px;
-        width: 100%;
-        border-radius: 18px;
-        background: rgba(255,255,255,0.05);
-        border: 1px solid rgba(255,255,255,0.12);
-        position: relative;
-        overflow: hidden;
-    }
+/* Background */
+.background {
+  position: absolute;
+  width: 800px;
+  height: 600px;
+  background: linear-gradient(#87ceeb, #b0e0e6);
+  animation: bgMove 6s linear infinite;
+}
 
-    .fluid {
-        position: absolute;
-        bottom: -100%;
-        width: 100%;
-        height: 100%;
-        background:
-            linear-gradient(
-                180deg,
-                rgba(255,90,90,0.85),
-                rgba(180,30,60,0.95)
-            );
-        filter: blur(0.3px);
-        animation: rise 4s cubic-bezier(.2,.8,.2,1) forwards;
-    }
+@keyframes bgMove {
+  from { transform: translateX(0); }
+  to { transform: translateX(-400px); }
+}
 
-    /* subtle surface movement */
-    .fluid::before {
-        content: '';
-        position: absolute;
-        top: -10px;
-        left: -20%;
-        width: 140%;
-        height: 25px;
-        background: rgba(255,255,255,0.25);
-        border-radius: 50%;
-        filter: blur(8px);
-        animation: drift 6s linear infinite;
-    }
+/* Plane */
+.plane {
+  position: absolute;
+  width: 50px;
+  height: 30px;
+  background: red;
+  clip-path: polygon(0 50%, 100% 0, 80% 50%, 100% 100%);
+  top: 250px;
+  left: 60px;
+}
 
-    @keyframes rise {
-        to {
-            bottom: -20%;
-        }
-    }
+/* Buildings */
+.building {
+  position: absolute;
+  width: 60px;
+  background: #444;
+  right: -60px;
+}
 
-    @keyframes drift {
-        from { transform: translateX(0); }
-        to { transform: translateX(40%); }
-    }
+.top {
+  top: 0;
+}
 
-    .value {
-        margin-top: 22px;
-        font-size: 32px;
-        font-weight: 500;
-        letter-spacing: 1px;
-    }
+.bottom {
+  bottom: 0;
+}
 
-    .sub {
-        margin-top: 6px;
-        font-size: 13px;
-        opacity: 0.6;
-    }
+/* Score */
+.score {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 24px;
+  color: white;
+}
 </style>
 </head>
+
 <body>
+<div class="game">
+  <div class="background"></div>
+  <div class="plane" id="plane"></div>
+  <div class="score" id="score">0</div>
+</div>
 
-<div class="panel">
-    <div class="label">Suicidal Rate</div>
+<script>
+const plane = document.getElementById("plane");
+const game = document.querySelector(".game");
+const scoreEl = document.getElementById("score");
 
-    <div class="tank">
-        <div class="fluid"></div>
+let planeTop = 250;
+let gravity = 1.8;
+let score = 0;
+let gameOver = false;
+
+// Gravity
+const fall = setInterval(() => {
+  if (planeTop < 570) {
+    planeTop += gravity;
+    plane.style.top = planeTop + "px";
+  }
+}, 20);
+
+// Jump
+document.addEventListener("keydown", () => {
+  if (!gameOver) planeTop -= 40;
+});
+
+// Buildings
+function createBuildings() {
+  if (gameOver) return;
+
+  const gap = 150;
+  const buildingHeight = Math.floor(Math.random() * 200) + 50;
+
+  const topBuilding = document.createElement("div");
+  topBuilding.classList.add("building", "top");
+  topBuilding.style.height = buildingHeight + "px";
+
+  const bottomBuilding = document.createElement("div");
+  bottomBuilding.classList.add("building", "bottom");
+  bottomBuilding.style.height = (600 - buildingHeight - gap) + "px";
+
+  game.appendChild(topBuilding);
+  game.appendChild(bottomBuilding);
+
+  let buildingLeft = 400;
+
+  const move = setInterval(() => {
+    if (gameOver) {
+      clearInterval(move);
+      return;
+    }
+
+    buildingLeft -= 2;
+    topBuilding.style.left = buildingLeft + "px";
+    bottomBuilding.style.left = buildingLeft + "px";
+
+    // Collision
+    if (
+      buildingLeft < 110 &&
+      buildingLeft > 50 &&
+      (planeTop < buildingHeight ||
+       planeTop > 600 - bottomBuilding.offsetHeight)
+    ) {
+      gameOver = true;
+      alert("Game Over! Score: " + score);
+      location.reload();
+    }
+
+    // Score
+    if (buildingLeft === 50) {
+      score++;
+      scoreEl.innerText = score;
+    }
+
+    if (buildingLeft < -60) {
+      clearInterval(move);
+      topBuilding.remove();
+      bottomBuilding.remove();
+    }
+  }, 20);
+}
+
+setInterval(createBuildings, 2000);
+</script>
+</body>
+</html>        <div class="fluid"></div>
     </div>
 
     <div class="value">80%</div>
